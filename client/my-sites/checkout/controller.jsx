@@ -220,7 +220,7 @@ export function conciergeQuickstartSession( context, next ) {
 }
 
 export function planUpgradeNudge( context, next ) {
-	const { product } = context.params;
+	const { product, receiptId } = context.params;
 	context.store.dispatch( setSection( { name: 'plan-upgrade-nudge' }, { hasSidebar: false } ) );
 
 	const state = context.store.getState();
@@ -233,7 +233,11 @@ export function planUpgradeNudge( context, next ) {
 	context.primary = (
 		<CartData>
 			<Checkout>
-				<PlanUpgradenNudge selectedSiteId={ selectedSite.ID } product={ product } />
+				<PlanUpgradenNudge
+					selectedSiteId={ selectedSite.ID }
+					product={ product }
+					receiptId={ Number( receiptId ) }
+				/>
 			</Checkout>
 		</CartData>
 	);
