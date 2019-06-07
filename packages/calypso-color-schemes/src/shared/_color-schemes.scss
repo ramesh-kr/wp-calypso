@@ -1194,10 +1194,10 @@
 	&.is-midnight {
 		--color-primary: #{$muriel-gray-700};
 		--color-primary-rgb: #{hex-to-rgb( $muriel-gray-700 )};
-		--color-primary-light: #{$muriel-gray-400};
-		--color-primary-light-rgb: #{hex-to-rgb( $muriel-gray-400 )};
-		--color-primary-dark: #{$muriel-gray-700};
-		--color-primary-dark-rgb: #{hex-to-rgb( $muriel-gray-700 )};
+		--color-primary-light: #{$muriel-gray-500};
+		--color-primary-light-rgb: #{hex-to-rgb( $muriel-gray-500 )};
+		--color-primary-dark: #{$muriel-gray-800};
+		--color-primary-dark-rgb: #{hex-to-rgb( $muriel-gray-800 )};
 		--color-primary-0: #{$muriel-gray-0};
 		--color-primary-0-rgb: #{hex-to-rgb( $muriel-gray-0 )};
 		--color-primary-50: #{$muriel-gray-50};
