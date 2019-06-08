@@ -1,9 +1,6 @@
-/** @format */
-
 /**
  * External dependencies
  */
-
 import validator from 'is-my-json-valid';
 import {
 	forEach,
@@ -17,7 +14,7 @@ import {
 	reduce,
 	reduceRight,
 } from 'lodash';
-import { combineReducers as combine } from 'redux'; // eslint-disable-line wpcalypso/import-no-redux-combine-reducers
+import { combineReducers as combine, Reducer, AnyAction, Action } from 'redux'; // eslint-disable-line wpcalypso/import-no-redux-combine-reducers
 import LRU from 'lru';
 
 /**
@@ -63,6 +60,8 @@ export function isValidStateWithSchema( state, schema, debugInfo ) {
 	}
 	return valid;
 }
+
+type CalypsoInitAction = Action< '@@calypso/INIT' >;
 
 /**
  * Creates a super-reducer as a map of reducers over keyed objects
@@ -112,15 +111,18 @@ export function isValidStateWithSchema( state, schema, debugInfo ) {
  *     }
  * }
  *
- * @param {string} keyPath lodash-style path to the key in action referencing item in state map
- * @param {Function} reducer applied to referenced item in state map
- * @return {Function} super-reducer applying reducer over map of keyed items
+ * @param  keyPath lodash-style path to the key in action referencing item in state map
+ * @param  reducer applied to referenced item in state map
+ * @return super-reducer applying reducer over map of keyed items
  */
-export const keyedReducer = ( keyPath, reducer ) => {
+export const keyedReducer = < S = any, A extends Action = AnyAction >(
+	keyPath: string,
+	reducer: Reducer< S, A | CalypsoInitAction >
+): Reducer< { [key: string]: S } | undefined, A | CalypsoInitAction > => {
 	// some keys are invalid
 	if ( 'string' !== typeof keyPath ) {
 		throw new TypeError(
-			'Key name passed into '`keyedReducer`` must be a string but I detected a ${ typeof keyName }`
+			`Key name passed into \`keyedReducer\` must be a string but I detected a ${ typeof keyPath }`
 		);
 	}
 
@@ -132,7 +134,7 @@ export const keyedReducer = ( keyPath, reducer ) => {
 
 	if ( 'function' !== typeof reducer ) {
 		throw new TypeError(
-			'Reducer passed into '`keyedReducer`` must be a function but I detected a ${ typeof reducer }`
+			`Reducer passed into \`keyedReducer\` must be a function but I detected a ${ typeof reducer }`
 		);
 	}
 
