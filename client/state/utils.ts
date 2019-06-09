@@ -66,7 +66,7 @@ type CalypsoInitAction = Action< '@@calypso/INIT' >;
 interface KeyedState< S > {
 	[key: string]: S;
 }
-type KeyedReducer< S, A extends Action > = Reducer< KeyedState< S >, A >;
+type KeyedReducer< S, A extends Action > = Reducer< KeyedState< S > | undefined, A >;
 
 /**
  * Creates a super-reducer as a map of reducers over keyed objects
@@ -148,7 +148,7 @@ export const keyedReducer = < S = any, A extends Action = AnyAction >(
 	const wrappedReducer = (
 		state: KeyedState< S > = {},
 		action: A | CalypsoInitAction
-	): KeyedState< S > => {
+	): KeyedState< S > | undefined => {
 		if ( action.type === SERIALIZE ) {
 			return Object.keys( state ).reduce( ( result, itemKey ) => {
 				const itemValue = state[ itemKey ];
