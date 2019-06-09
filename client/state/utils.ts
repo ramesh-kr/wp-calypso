@@ -63,6 +63,11 @@ export function isValidStateWithSchema( state, schema, debugInfo ) {
 
 type CalypsoInitAction = Action< '@@calypso/INIT' >;
 
+interface KeyedState< S > {
+	[key: string]: S;
+}
+type KeyedReducer< S, A extends Action > = Reducer< KeyedState< S >, A >;
+
 /**
  * Creates a super-reducer as a map of reducers over keyed objects
  *
@@ -118,7 +123,7 @@ type CalypsoInitAction = Action< '@@calypso/INIT' >;
 export const keyedReducer = < S = any, A extends Action = AnyAction >(
 	keyPath: string,
 	reducer: Reducer< S, A | CalypsoInitAction >
-): Reducer< { [key: string]: S } | undefined, A | CalypsoInitAction > => {
+): KeyedReducer< S, A | CalypsoInitAction > => {
 	// some keys are invalid
 	if ( 'string' !== typeof keyPath ) {
 		throw new TypeError(
@@ -140,24 +145,23 @@ export const keyedReducer = < S = any, A extends Action = AnyAction >(
 
 	const initialState = reducer( undefined, { type: '@@calypso/INIT' } );
 
-	return ( state = {}, action ) => {
+	const wrappedReducer = (
+		state: KeyedState< S > = {},
+		action: A | CalypsoInitAction
+	): KeyedState< S > => {
 		if ( action.type === SERIALIZE ) {
-			const serialized = reduce(
-				state,
-				( result, itemValue, itemKey ) => {
-					const serializedValue = reducer( itemValue, action );
-					if ( serializedValue !== undefined && ! isEqual( serializedValue, initialState ) ) {
-						if ( ! result ) {
-							// instantiate the result object only when it's going to have at least one property
-							result = new SerializationResult();
-						}
-						result.addRootResult( itemKey, serializedValue );
+			return Object.keys( state ).reduce( ( result, itemKey ) => {
+				const itemValue = state[ itemKey ];
+				const serializedValue = reducer( itemValue, action );
+				if ( serializedValue !== undefined && ! isEqual( serializedValue, initialState ) ) {
+					if ( ! result ) {
+						// instantiate the result object only when it's going to have at least one property
+						result = new SerializationResult();
 					}
-					return result;
-				},
-				undefined
-			);
-			return serialized;
+					result.addRootResult( itemKey, serializedValue );
+				}
+				return result;
+			}, {} );
 		}
 
 		if ( action.type === DESERIALIZE ) {
@@ -199,6 +203,8 @@ export const keyedReducer = < S = any, A extends Action = AnyAction >(
 			[ itemKey ]: newItemState,
 		};
 	};
+
+	return wrappedReducer;
 };
 
 /**
