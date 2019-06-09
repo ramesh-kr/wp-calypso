@@ -161,7 +161,7 @@ export const keyedReducer = < S = any, A extends Action = AnyAction >(
 					result.addRootResult( itemKey, serializedValue );
 				}
 				return result;
-			}, {} );
+			}, undefined );
 		}
 
 		if ( action.type === DESERIALIZE ) {
