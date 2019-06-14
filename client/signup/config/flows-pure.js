@@ -274,7 +274,7 @@ export function generateFlows( {
 
 	if ( config.isEnabled( 'signup/wpcc' ) ) {
 		flows.wpcc = {
-			steps: [ 'oauth2-user' ],
+			steps: [ 'oauth2-passwordless' ],
 			destination: getRedirectDestination,
 			description: 'WordPress.com Connect signup flow',
 			lastModified: '2017-08-24',

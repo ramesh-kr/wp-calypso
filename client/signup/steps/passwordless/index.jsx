@@ -101,10 +101,16 @@ export class PasswordlessStep extends Component {
 
 	verifyUser = event => {
 		event.preventDefault();
+		const queryArgs = ( this.props.initialContext && this.props.initialContext.query ) || null;
 		const data = {
 			email: getFieldValue( this.formStore.get(), 'email' ),
 			code: getFieldValue( this.formStore.get(), 'code' ),
 		};
+
+		if ( this.props.oauth2Signup && queryArgs ) {
+			data.oauth2_client_id = queryArgs.oauth2_client_id;
+			data.oauth2_redirect = queryArgs.oauth2_redirect;
+		}
 
 		this.setState( {
 			errorMessages: null,
