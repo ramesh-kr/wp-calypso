@@ -58,6 +58,12 @@ class SiteDescriptionEdit extends Component {
 
 	updateInitialDescription = () => this.setState( { initialDescription: this.state.description } );
 
+	handleUpdate( description ) {
+		const { setAttributes } = this.props;
+		this.setState( { description } );
+		setAttributes( { updated: Date.now() } );
+	}
+
 	render() {
 		const { className, noticeUI } = this.props;
 		const { description } = this.state;
@@ -68,7 +74,7 @@ class SiteDescriptionEdit extends Component {
 				<PlainText
 					className={ className }
 					value={ description }
-					onChange={ value => this.setState( { description: value } ) }
+					onChange={ value => this.handleUpdate( value ) }
 					placeholder={ __( 'Site Description' ) }
 					aria-label={ __( 'Site Description' ) }
 				/>

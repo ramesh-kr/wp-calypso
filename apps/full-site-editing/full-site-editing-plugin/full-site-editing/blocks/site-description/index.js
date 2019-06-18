@@ -21,5 +21,11 @@ registerBlockType( 'a8c/site-description', {
 		reusable: false,
 	},
 	edit,
+	attributes: {
+		updated: {
+			default: null,
+			type: 'number',
+		},
+	},
 	save: () => null,
 } );
