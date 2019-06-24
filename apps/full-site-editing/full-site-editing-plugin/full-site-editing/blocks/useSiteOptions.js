@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { useState, useEffect } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -36,6 +37,8 @@ export default function useSiteOptions(
 		}
 	} );
 
+	const { forceEditorIsDirty } = useDispatch( 'core/editor' );
+
 	function loadSiteOption() {
 		apiFetch( { path: '/wp/v2/settings' } )
 			.then( result =>
@@ -60,7 +63,9 @@ export default function useSiteOptions(
 		const { option, previousOption } = siteOptions;
 		const optionUnchanged = option && option.trim() === previousOption.trim();
 		const optionIsEmpty = ! option || option.trim().length === 0;
-
+		if ( ! optionUnchanged ) {
+			forceEditorIsDirty();
+		}
 		// Reset to initial value if user de-selects the block with an empty value.
 		if ( ! isSelected && previousIsSelected && optionIsEmpty ) {
 			revertOption();
@@ -74,17 +79,6 @@ export default function useSiteOptions(
 		if ( ! previousShouldUpdateSiteOption && shouldUpdateSiteOption ) {
 			saveSiteOption( option );
 		}
-	}
-
-	function onSave() {
-		const { option, previousOption } = siteOptions;
-		const optionUnchanged = option && option.trim() === previousOption.trim();
-
-		if ( optionUnchanged ) {
-			setSiteOptions( { ...siteOptions, isDirty: false } );
-			return;
-		}
-		saveSiteOption( option );
 	}
 
 	function saveSiteOption( option ) {
@@ -114,5 +108,5 @@ export default function useSiteOptions(
 		} );
 	}
 
-	return { siteOptions, setSiteOptions, onSave };
+	return { siteOptions, setSiteOptions };
 }

@@ -7,7 +7,7 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withNotices, Button } from '@wordpress/components';
+import { withNotices } from '@wordpress/components';
 import { PlainText } from '@wordpress/editor';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -26,7 +26,7 @@ function SiteTitleEdit( {
 	isSelected,
 } ) {
 	const inititalTitle = __( 'Site title loading…' );
-	const { onSave, siteOptions, setSiteOptions } = useSiteOptions(
+	const { siteOptions, setSiteOptions } = useSiteOptions(
 		'title',
 		inititalTitle,
 		noticeOperations,
@@ -34,7 +34,7 @@ function SiteTitleEdit( {
 		shouldUpdateSiteOption
 	);
 
-	const { option, isDirty, isSaving } = siteOptions;
+	const { option } = siteOptions;
 
 	return (
 		<Fragment>
@@ -46,17 +46,6 @@ function SiteTitleEdit( {
 				placeholder={ __( 'Site Title' ) }
 				aria-label={ __( 'Site Title' ) }
 			/>
-			{ isDirty && (
-				<Button
-					isLarge
-					className="site-title__save-button"
-					disabled={ isSaving }
-					isBusy={ isSaving }
-					onClick={ onSave }
-				>
-					{ __( 'Save' ) }
-				</Button>
-			) }
 		</Fragment>
 	);
 }
