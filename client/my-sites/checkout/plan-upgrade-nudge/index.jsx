@@ -26,15 +26,15 @@ import { planItem as getCartItemForPlan } from 'lib/cart-values/cart-items';
 import getUpgradePlanSlugFromPath from 'state/selectors/get-upgrade-plan-slug-from-path';
 import { getCurrentUserCurrencyCode } from 'state/current-user/selectors';
 import { getSiteSlug } from 'state/sites/selectors';
-import {
-	getProductsList,
-	getProductDisplayCost,
-	getProductCost,
-	isProductsListFetching,
-} from 'state/products-list/selectors';
+import { getProductsList, isProductsListFetching } from 'state/products-list/selectors';
 import { recordTracksEvent } from 'state/analytics/actions';
 import { localize } from 'i18n-calypso';
-import { isRequestingSitePlans, getPlansBySiteId } from 'state/sites/plans/selectors';
+import {
+	isRequestingSitePlans,
+	getPlansBySiteId,
+	getSitePlanRawPrice,
+	getPlanDiscountedRawPrice,
+} from 'state/sites/plans/selectors';
 
 /**
  * Style dependencies
@@ -109,107 +109,208 @@ export class PlanUpgradeNudge extends React.Component {
 	header() {
 		const { translate } = this.props;
 		return (
-			<header className="plan-upgrade-nudge__header">
+			<header className="plan-upgrade-nudge__small-header">
 				<h2 className="plan-upgrade-nudge__title">
-					{ translate( 'Congratulations, we have an offer for you.' ) }
+					{ translate( 'Hold tight, your site is being upgraded.' ) }
 				</h2>
 			</header>
 		);
 	}
 
 	body() {
-		const { translate, productCost, productDisplayCost, currencyCode } = this.props;
-		// Full cost should be 150% of base cost
-		const fullCost = Math.round( productCost * 1.5 );
-		const savings = fullCost - productCost;
+		const { translate, planRawPrice, planDiscountedRawPrice, currencyCode } = this.props;
+		const bundleValue = planRawPrice * 77;
 		return (
 			<Fragment>
+				<h2 className="plan-upgrade-nudge__header">
+					{ translate( 'Do you want your site to look great?' ) }
+				</h2>
+				<h4 className="plan-upgrade-nudge__sub-header">
+					{ translate(
+						'Add {{u}}%(bundleValue)s worth{{/u}} of Premium Designs to your order {{u}}for just %(discountPrice)s{{/u}}!',
+						{
+							args: {
+								bundleValue: formatCurrency( bundleValue, currencyCode, { precision: 0 } ),
+								discountPrice: formatCurrency( planDiscountedRawPrice, currencyCode ),
+							},
+							components: { u: <u /> },
+						}
+					) }
+				</h4>
 				<div className="plan-upgrade-nudge__column-pane">
 					<div className="plan-upgrade-nudge__column-content">
-						<h4 className="plan-upgrade-nudge__sub-header">
-							{ translate( 'Do you want to upgrade your site?' ) }
-						</h4>
-
 						<p>
-							<b>{ translate( 'Upgrade your site to Premium.' ) }</b>
+							<b>
+								{ translate(
+									'According to Google, design is quite possibly the best investment you can make.'
+								) }
+							</b>
 						</p>
 
-						<p>{ translate( 'What you get out of the upgrade:' ) }</p>
+						<p>
+							{ translate(
+								'Why? Cause based on their research, 50% of the people visiting your site decide to leave or stay within the first three seconds.'
+							) }
+						</p>
+
+						<p>
+							{ translate( '{{i}}Three seconds!{{/i}}', {
+								components: { i: <i /> },
+							} ) }
+						</p>
+
+						<p>
+							{ translate(
+								"Wouldn't you like a sure-fire way to make a great first impression in those 3 seconds?"
+							) }
+						</p>
+
+						<p>{ translate( "Of course! And thankfully, there's a way." ) }</p>
+
+						<p>
+							{ translate(
+								"Great looking sites {{b}}always{{/b}} create great first impressions and leave people wanting to know more about your site. And that's what we want, right?",
+								{
+									components: { b: <b /> },
+								}
+							) }
+						</p>
+
+						<p>
+							{ translate(
+								"That's exactly why we've partnered with some of the world's greatest designers to create nearly 200 high-end designs that you can use to make your site looks incredible."
+							) }
+						</p>
+
+						<p>
+							{ translate(
+								'These premium themes are beautiful, optimized for mobile and search engines, and most importantly, they are ready to use for almost any scenario you can think of…'
+							) }
+						</p>
+
+						<p>
+							{ translate(
+								'…small businesses, brick-and-mortar shops, boutiques, photography, clubs, portfolios, fashion, food, blogging, music, freelancing, NGOs, agencies, travel, boutiques, associations, announcements, weddings and more…'
+							) }
+						</p>
+
+						<p>
+							{ translate(
+								'Normally, this type of premium WordPress themes {{b}}cost $100 or more each{{/b}}.',
+								{
+									components: { b: <b /> },
+								}
+							) }
+						</p>
+
+						<p>
+							{ translate(
+								"But because we made a bundle with all these designs inside our Premium plan, you won't pay anywhere near that much today."
+							) }
+						</p>
+
+						<p>
+							{ translate(
+								"In fact, if you take advantage of this offer you won't even pay the full price %(fullPrice)s/yr that the Premium plan costs!",
+								{
+									args: {
+										fullPrice: formatCurrency( planRawPrice, currencyCode ),
+									},
+								}
+							) }{' '}
+						</p>
+
+						<p>
+							{ translate(
+								"Because you just purchased a brand new plan, we'll give you a one-time-only special price. Which means that you can get unlimited access to nearly 200 high-end designs for just %(discountPrice)s/yr!",
+								{
+									args: {
+										discountPrice: formatCurrency( planDiscountedRawPrice, currencyCode ),
+									},
+								}
+							) }
+						</p>
+
+						<p>
+							{ translate(
+								'Oh, and in addition to the nearly 200 beautiful site themes included, the Premium plan also comes with some really useful features that our customers truly enjoy:'
+							) }
+						</p>
 
 						<ul className="plan-upgrade-nudge__checklist">
 							<li className="plan-upgrade-nudge__checklist-item">
 								<Gridicon icon="checkmark" className="plan-upgrade-nudge__checklist-item-icon" />
 								<span className="plan-upgrade-nudge__checklist-item-text">
-									{ translate( '{{b}}Feature:{{/b}} Feature description.', {
-										components: { b: <b /> },
-										comment: "This is a benefit listed on a 'Purchase a call with us' page",
-									} ) }
+									{ translate(
+										'Like {{b}}the ability to monetize your site{{/b}}. Yes, to make money with your site. You can sell stuff on your site without any hassle. Or make earnings through our special premium advertising program. Or why not both?',
+										{
+											components: { b: <b /> },
+											comment: "This is a benefit listed on a 'Upgrade your plan' page",
+										}
+									) }
 								</span>
 							</li>
 							<li className="plan-upgrade-nudge__checklist-item">
 								<Gridicon icon="checkmark" className="plan-upgrade-nudge__checklist-item-icon" />
 								<span className="plan-upgrade-nudge__checklist-item-text">
-									{ translate( '{{b}}Feature:{{/b}} Feature description.', {
-										components: { b: <b /> },
-										comment: "This is a benefit listed on a 'Purchase a call with us' page",
-									} ) }
+									{ translate(
+										"Or like {{b}}our special tools to turn yourself into a social media pro{{/b}}. Like scheduling posts in advance (so you don't have to become a slave of social media to make it work) and our nifty promotion tools.",
+										{
+											components: { b: <b /> },
+											comment: "This is a benefit listed on a 'Upgrade your plan' page",
+										}
+									) }
 								</span>
 							</li>
 							<li className="plan-upgrade-nudge__checklist-item">
 								<Gridicon icon="checkmark" className="plan-upgrade-nudge__checklist-item-icon" />
 								<span className="plan-upgrade-nudge__checklist-item-text">
-									{ translate( '{{b}}Feature:{{/b}} Feature description.', {
-										components: { b: <b /> },
-										comment: "This is a benefit listed on a 'Purchase a call with us' page",
-									} ) }
-								</span>
-							</li>
-							<li className="plan-upgrade-nudge__checklist-item">
-								<Gridicon icon="checkmark" className="plan-upgrade-nudge__checklist-item-icon" />
-								<span className="plan-upgrade-nudge__checklist-item-text">
-									{ translate( '{{b}}Feature:{{/b}} Feature description.', {
-										components: { b: <b /> },
-										comment: "This is a benefit listed on a 'Purchase a call with us' page",
-									} ) }
-								</span>
-							</li>
-							<li className="plan-upgrade-nudge__checklist-item">
-								<Gridicon icon="checkmark" className="plan-upgrade-nudge__checklist-item-icon" />
-								<span className="plan-upgrade-nudge__checklist-item-text">
-									{ translate( '{{b}}And more:{{/b}} Feature description.', {
-										components: { b: <b /> },
-										comment: "This is a benefit listed on a 'Purchase a call with us' page",
-									} ) }
+									{ translate(
+										'Or what about the chance to {{b}}customize your premium theme to your exact needs{{/b}}? Meaning your site can be totally customized and have its unique essence, so it will never be the same as others.',
+										{
+											components: { b: <b /> },
+											comment: "This is a benefit listed on a 'Upgrade your plan' page",
+										}
+									) }
 								</span>
 							</li>
 						</ul>
 
-						<h4 className="plan-upgrade-nudge__sub-header">
-							{ translate( 'Upgrade your plan, and save %(saveAmount)s if you sign up today.', {
-								args: {
-									saveAmount: formatCurrency( savings, currencyCode ),
-								},
-							} ) }
-						</h4>
+						<p>
+							{ translate(
+								'And to top it all off, you can give the Premium plan a risk-free test drive thanks to our {{u}}30-day Money Back Guarantee{{/u}}.',
+								{
+									components: { u: <u /> },
+								}
+							) }
+						</p>
+						<p>
+							{ translate(
+								'Are you ready to get started? Go for it now, because this special one-time offer will be gone once you leave this screen.'
+							) }
+						</p>
 
 						<p>
 							<b>
-								{ translate( 'Upgrade your plan for just {{del}}%(oldPrice)s{{/del}} %(price)s.', {
-									components: { del: <del /> },
-									args: {
-										oldPrice: formatCurrency( fullCost, currencyCode ),
-										price: productDisplayCost,
-									},
-								} ) }
-							</b>{' '}
-							{ translate( 'Click the button below to confirm your purchase.' ) }
+								{ translate(
+									'Upgrade to the Premium plan (with %(bundleValue)s worth of premium themes) for just {{del}}%(fullPrice)s{{/del}} %(discountPrice)s/yr.',
+									{
+										components: { del: <del /> },
+										args: {
+											bundleValue: formatCurrency( bundleValue, currencyCode, { precision: 0 } ),
+											fullPrice: formatCurrency( planRawPrice, currencyCode ),
+											discountPrice: formatCurrency( planDiscountedRawPrice, currencyCode ),
+										},
+									}
+								) }
+							</b>
 						</p>
 					</div>
 					<div className="plan-upgrade-nudge__column-doodle">
 						<img
 							className="plan-upgrade-nudge__doodle"
 							alt=""
-							src="/calypso/images/illustrations/support.svg"
+							src="/calypso/images/illustrations/themes.svg"
 						/>
 					</div>
 				</div>
@@ -218,25 +319,21 @@ export class PlanUpgradeNudge extends React.Component {
 	}
 
 	footer() {
-		const { translate, productDisplayCost } = this.props;
+		const { translate } = this.props;
 		return (
 			<footer className="plan-upgrade-nudge__footer">
 				<Button
 					className="plan-upgrade-nudge__decline-offer-button"
 					onClick={ this.handleClickDecline }
 				>
-					{ translate( 'Skip' ) }
+					{ translate( 'No thanks, I’ll stick with the free themes' ) }
 				</Button>
 				<Button
 					primary
 					className="plan-upgrade-nudge__accept-offer-button"
 					onClick={ this.handleClickAccept }
 				>
-					{ translate( 'Upgrade now for %(amount)s', {
-						args: {
-							amount: productDisplayCost,
-						},
-					} ) }
+					{ translate( 'Yes, give me those Premium designs!' ) }
 				</Button>
 			</footer>
 		);
@@ -284,8 +381,8 @@ export class PlanUpgradeNudge extends React.Component {
 }
 
 const trackUpsellButtonClick = buttonAction => {
-	// Track calypso_concierge_session_upsell_decline_button_click and calypso_concierge_session_upsell_accept_button_click events
-	return recordTracksEvent( `calypso_concierge_session_upsell_${ buttonAction }_button_click`, {
+	// Track calypso_upgrade_plan_upsell_decline_button_click and calypso_upgrade_plan_upsell_accept_button_click events
+	return recordTracksEvent( `calypso_upgrade_plan_upsell_${ buttonAction }_button_click`, {
 		section: 'checkout',
 	} );
 };
@@ -295,15 +392,22 @@ export default connect(
 		const { selectedSiteId } = props;
 		const productsList = getProductsList( state );
 		const sitePlans = getPlansBySiteId( state ).data;
+		const planSlug = getUpgradePlanSlugFromPath( state, selectedSiteId, props.product );
+		const annualDiscountPrice = getPlanDiscountedRawPrice( state, selectedSiteId, planSlug, {
+			isMonthly: false,
+		} );
+		const annualPrice = getSitePlanRawPrice( state, selectedSiteId, planSlug, {
+			isMonthly: false,
+		} );
 		return {
 			currencyCode: getCurrentUserCurrencyCode( state ),
 			isLoading: isProductsListFetching( state ) || isRequestingSitePlans( state, selectedSiteId ),
 			hasProductsList: Object.keys( productsList ).length > 0,
 			hasSitePlans: sitePlans && sitePlans.length > 0,
 			siteSlug: getSiteSlug( state, selectedSiteId ),
-			productCost: getProductCost( state, 'concierge-session' ),
-			productDisplayCost: getProductDisplayCost( state, 'concierge-session' ),
-			planSlug: getUpgradePlanSlugFromPath( state, selectedSiteId, props.product ),
+			planRawPrice: annualPrice,
+			planDiscountedRawPrice: annualDiscountPrice,
+			planSlug: planSlug,
 		};
 	},
 	{
