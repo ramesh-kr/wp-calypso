@@ -326,7 +326,7 @@ export class PlanUpgradeNudge extends React.Component {
 					className="plan-upgrade-nudge__decline-offer-button"
 					onClick={ this.handleClickDecline }
 				>
-					{ translate( 'No thanks, I’ll stick with the free themes' ) }
+					{ translate( "No thanks, I'll stick with the free themes" ) }
 				</Button>
 				<Button
 					primary
