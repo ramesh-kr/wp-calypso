@@ -22,6 +22,7 @@ import {
 	supportsPrivacyProtectionPurchase,
 	planItem as getCartItemForPlan,
 } from 'lib/cart-values/cart-items';
+import { isDomainRegistration, isDomainTransfer } from 'lib/products-values';
 
 // State actions and selectors
 import { SIGNUP_OPTIONAL_DEPENDENCY_SUGGESTED_USERNAME_SET } from 'state/action-types';
@@ -49,7 +50,6 @@ import flows from 'signup/config/flows';
 import steps from 'signup/config/steps';
 import { normalizeImportUrl } from 'state/importer-nux/utils';
 import { isEligibleForPageBuilder, shouldEnterPageBuilder } from 'lib/signup/page-builder';
-import { isDomainRegistration, isDomainTransfer } from '../products-values';
 
 /**
  * Constants
